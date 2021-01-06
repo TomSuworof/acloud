@@ -7,9 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.io.File;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequiredArgsConstructor
@@ -24,11 +24,11 @@ public class DashboardController {
         return "dashboard";
     }
 
-    @GetMapping("/dashboard/load_file")
-    String loadFile(@RequestParam File loadedFile, Model model) {
+    @PostMapping("/dashboard/load_file")
+    String loadFile(@RequestParam(name = "file") MultipartFile loadedFile, Model model) {
         User currentUser = userService.getUserFromContext();
-        if (userFileService.loadFile(currentUser, loadedFile)) {
-            return "redirect: /dashboard";
+        if (userFileService.loadFileTo(loadedFile, currentUser)) {
+            return "redirect:/dashboard";
         } else {
             model.addAttribute("error", "Error loading file");
             return "dashboard";

@@ -63,6 +63,7 @@ public class UserService implements UserDetailsService {
         }
 
         userFromDB.setEmail(userFromForm.getEmail());
+        userFromDB.setUserFiles(userFromForm.getUserFiles());
 
         if (passwordWasChanged) {
             return updateWithPassword(userFromDB, userFromForm.getPasswordNew());

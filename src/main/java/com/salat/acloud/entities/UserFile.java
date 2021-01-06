@@ -2,6 +2,7 @@ package com.salat.acloud.entities;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -37,11 +38,11 @@ public class UserFile {
         return file;
     }
 
-    public UserFile(File file, String author) {
+    public UserFile(MultipartFile file, String author) {
         this.author = author;
-        this.filename = file.getName();
-        try (InputStream inputStream = new FileInputStream(file)) {
-            this.content = inputStream.readAllBytes();
+        this.filename = file.getOriginalFilename();
+        try {
+            this.content = file.getBytes();
         } catch (IOException e) {
             e.printStackTrace();
         }
