@@ -1,10 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Dashboard</title>
 </head>
 <body>
-Here is dashboard for files
+<div>
+    <a href="/">Main</a>
+</div>
+<div>
+    <h1>Dashboard</h1>
+    <div>
+        <h2>Add userFile</h2>
+        <div>
+            <form action="/dashboard/load_file">
+                <div>
+                    <input type="file" name="file">
+                </div>
+                <div>
+                    <p th:value="${error}"></p>
+                </div>
+                <div>
+                    <input type="submit">
+                </div>
+            </form>
+        </div>
+    </div>
+    <div>
+        <h2>Search</h2>
+        <form action="/dashboard/search">
+            <div>
+                <label>
+                    <input type="text" name="query" placeholder="Write query">
+                </label>
+            </div>
+            <div>
+                <input type="submit">
+            </div>
+        </form>
+    </div>
+    <div>
+        <h2>Files</h2>
+        <div>
+            <div th:each="userFile : ${files}">
+                <h3 th:value="${userFile.getFilename()}"></h3>
+                <p th:value="${userFile.getAuthor()}"></p>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
