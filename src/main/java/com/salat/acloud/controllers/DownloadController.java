@@ -2,9 +2,10 @@ package com.salat.acloud.controllers;
 
 import com.salat.acloud.services.UserFileService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.FileCopyUtils;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,7 +21,7 @@ public class DownloadController {
     @GetMapping("/download_my/{id}")
     public @ResponseBody Object getMyFile(@PathVariable Long id, HttpServletResponse response) {
         try {
-            File responseFile = userFileService.getMyFileById(id);
+            File responseFile = userFileService.getMyFileById(id).makeFile();
             response.setContentType("application/" + userFileService.getExtension(responseFile));
             response.setHeader("Content-Disposition", "inline; filename=" + responseFile.getName());
             response.setHeader("Content-Length", String.valueOf(responseFile.length()));
@@ -30,28 +31,28 @@ public class DownloadController {
         }
     }
 
-//    @GetMapping("/download/{id}")
-//    public @ResponseBody Object getSomeFile(@PathVariable Long id, HttpServletResponse response) {
-//        try {
-//            File responseFile = userFileService.getSomeFileById(id);
-//            response.setContentType("application/" + userFileService.getExtension(responseFile));
-//            response.setHeader("Content-Disposition", "inline; filename=" + responseFile.getName());
-//            response.setHeader("Content-Length", String.valueOf(responseFile.length()));
-//            return new FileSystemResource(responseFile);
-//        } catch (FileNotFoundException noFile) {
-//            return "You have no rights"; // todo replace by page 'no_rights'
-//        }
-//    }
-
     @GetMapping("/download/{id}")
     public void getSomeFile(@PathVariable Long id, HttpServletResponse response) {
         try {
-            File responseFile = userFileService.getSomeFileById(id);
+            File responseFile = userFileService.getSomeFileById(id).makeFile();
             InputStream inputStream = new FileInputStream(responseFile);
-            FileCopyUtils.copy(inputStream, response.getOutputStream());
+            IOUtils.copy(inputStream, response.getOutputStream());
+            response.setContentType("application/" + userFileService.getExtension(responseFile));
+            response.setHeader("Content-Disposition", "inline; filename=" + responseFile.getName());
+            response.setHeader("Content-Length", String.valueOf(responseFile.length()));
             response.flushBuffer();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    } // todo fix this
+    } // todo replace by page 'no_rights'
+
+    @GetMapping("/download_my/{mode}/{id}")
+    public String getPermissionForFile(@PathVariable String mode, @PathVariable Long id, Model model) {
+        if (userFileService.setVisibility(id, mode)) {
+            return "redirect:/dashboard";
+        } else {
+            model.addAttribute("error", "Error changing state");
+            return "dashboard";
+        }
+    }
 }

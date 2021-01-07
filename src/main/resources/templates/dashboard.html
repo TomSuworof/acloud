@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <meta charset="UTF-8">
+    <link href="/static/css/dashboard_style.css" rel="stylesheet" type="text/css" media="all" />    <meta charset="UTF-8">
     <title>Dashboard</title>
 </head>
 <body>
-<div>
-    <a href="/">Main</a>
-</div>
-<div>
+<div class="header">
     <h1>Dashboard</h1>
-    <div>
-        <h2>Search</h2>
+</div>
+<div class="header-container">
+    <div class="header-main-link">
+        <a href="/">Main</a>
+    </div>
+    <div class="header-search">
         <form action="/dashboard/search" method="get">
             <div>
                 <label>
@@ -23,28 +24,39 @@
             </div>
         </form>
     </div>
-    <div>
-        <h2>Add file</h2>
+    <div class="header-add-file">
         <div>
             <form action="/dashboard/load_file" method="post" enctype="multipart/form-data">
                 <div>
                     <input type="file" name="file">
                 </div>
                 <div>
-                    <p th:text="${error}"></p>
-                </div>
-                <div>
-                    <input type="submit">
+                    <button type="submit">Submit</button>
                 </div>
             </form>
         </div>
     </div>
+</div>
+<div>
+    <p th:text="${error}"></p>
+</div>
+<div>
+    <h2>Files</h2>
     <div>
-        <h2>Files</h2>
-        <div>
-            <div th:each="userFile : ${files}">
-                <a download th:href="'/download_my/' + ${userFile.getId()}"><h3 th:text="${userFile.getFilename()}"></h3></a>
-                <p th:text="${userFile.getAuthor()}"></p>
+        <div th:each="userFile : ${files}">
+            <a download th:href="'/download_my/' + ${userFile.getId()}"><h3 th:text="${userFile.getFilename()}"></h3></a>
+            <div>Downloading publicly:
+                <div th:if="${userFile.isCanBeDownloadedPublicly()}">
+                    <form th:action="'/download_my/disable/' + ${userFile.getId()}">
+                        <button>Disable</button>
+                    </form>
+                    <a th:href="'/download/' + ${userFile.getId()}">Link</a>
+                </div>
+                <div th:unless="${userFile.isCanBeDownloadedPublicly()}">
+                    <form th:action="'/download_my/enable/' + ${userFile.getId()}">
+                        <button>Enable</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

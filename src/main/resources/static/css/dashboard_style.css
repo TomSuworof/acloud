@@ -1,0 +1,26 @@
+.header-container {
+    width: 100%;
+}
+
+.header-main-link {
+    align-content: center;
+    border: 1px solid black;
+    display: inline-block;
+    width: 10%;
+}
+
+.header-search {
+    border: 1px solid black;
+    display: inline-block;
+    width: 70%;
+}
+
+.header-add-file {
+    border: 1px solid black;
+    display: inline-block;
+    width: 19%;
+}
+
+body {
+    font-family: Arial, sans-serif;
+}
