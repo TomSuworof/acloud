@@ -11,6 +11,19 @@
 <div>
     <h1>Dashboard</h1>
     <div>
+        <h2>Search</h2>
+        <form action="/dashboard/search" method="get">
+            <div>
+                <label>
+                    <input type="text" name="query" placeholder="Write query">
+                </label>
+            </div>
+            <div>
+                <input type="submit">
+            </div>
+        </form>
+    </div>
+    <div>
         <h2>Add file</h2>
         <div>
             <form action="/dashboard/load_file" method="post" enctype="multipart/form-data">
@@ -27,23 +40,10 @@
         </div>
     </div>
     <div>
-        <h2>Search</h2>
-        <form action="/dashboard/search" method="get">
-            <div>
-                <label>
-                    <input type="text" name="query" placeholder="Write query">
-                </label>
-            </div>
-            <div>
-                <input type="submit">
-            </div>
-        </form>
-    </div>
-    <div>
         <h2>Files</h2>
         <div>
             <div th:each="userFile : ${files}">
-                <h3 th:text="${userFile.getFilename()}"></h3>
+                <a download th:href="'/download_my/' + ${userFile.getId()}"><h3 th:text="${userFile.getFilename()}"></h3></a>
                 <p th:text="${userFile.getAuthor()}"></p>
             </div>
         </div>

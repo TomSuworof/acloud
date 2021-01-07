@@ -18,14 +18,14 @@ public class DashboardController {
     private final UserFileService userFileService;
 
     @GetMapping("/dashboard")
-    String getDashboard(Model model) {
+    public String getDashboard(Model model) {
         User currentUser = userService.getUserFromContext();
         model.addAttribute("files", currentUser.getUserFiles());
         return "dashboard";
     }
 
     @PostMapping("/dashboard/load_file")
-    String loadFile(@RequestParam(name = "file") MultipartFile loadedFile, Model model) {
+    public String loadFile(@RequestParam(name = "file") MultipartFile loadedFile, Model model) {
         User currentUser = userService.getUserFromContext();
         if (userFileService.loadFileTo(loadedFile, currentUser)) {
             return "redirect:/dashboard";

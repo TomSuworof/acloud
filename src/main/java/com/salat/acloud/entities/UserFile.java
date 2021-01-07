@@ -28,15 +28,8 @@ public class UserFile {
     @Column
     private byte[] content;
 
-    public File makeFile() {
-        File file = new File(filename);
-        try (OutputStream outputStream = new FileOutputStream(file)) {
-            outputStream.write(content);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return file;
-    }
+    @Column
+    private boolean canBeDownloadedPublicly;
 
     public UserFile(MultipartFile file, String author) {
         this.author = author;
@@ -46,6 +39,17 @@ public class UserFile {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.canBeDownloadedPublicly = false;
         this.id = (long) (this.author + this.filename).hashCode();
+    }
+
+    public File makeFile() {
+        File file = new File(this.filename);
+        try (OutputStream outputStream = new FileOutputStream(file)) {
+            outputStream.write(this.content);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return file;
     }
 }

@@ -30,7 +30,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/favicon.ico").permitAll()
                 // Доступ только для не зарегистрированных пользователей
                 .antMatchers("/registration").not().fullyAuthenticated()
                 .antMatchers("/password_reset/**").not().fullyAuthenticated()
@@ -42,7 +41,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/personal_area/**").fullyAuthenticated()
                 .antMatchers("/dashboard/**").fullyAuthenticated()
                 // Доступ разрешен всем пользователей
-                .antMatchers("/", "/terms_of_use", "/static/**").permitAll()
+                .antMatchers("/", "/favicon.ico", "/terms_of_use", "/static/**", "/download/**").permitAll()
                 //Все остальные страницы требуют аутентификации
                 .anyRequest().authenticated()
                 .and()
