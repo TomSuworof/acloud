@@ -24,3 +24,17 @@
 body {
     font-family: Arial, sans-serif;
 }
+
+.header {
+    width: 100%;
+}
+
+.header-logo {
+    display: inline-block;
+    width: 90%;
+}
+
+.header-button-personal-area {
+    display: inline-block;
+    width: 9%;
+}

@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 @RequiredArgsConstructor
 public class PersonalAreaController {
-
     private final UserService userService;
 
     @GetMapping("/personal_area")
     public String returnPersonalPage(Model model) {
         User currentUser = userService.getUserFromContext();
         model.addAttribute("currentUser", currentUser);
+        model.addAttribute("show_admin_page", userService.isUser(currentUser, "admin"));
         return "personal_area";
     }
 

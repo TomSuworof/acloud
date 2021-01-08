@@ -1,10 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Admin</title>
 </head>
 <body>
-Admin-only page
+<div class="header-main-link">
+    <a href="/">Main</a>
+</div>
+<div>
+    <h1>Users</h1>
+</div>
+<div>
+    <p th:text="${error}"></p>
+</div>
+<div>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Roles</th>
+            <th>Actions</th>
+        </tr>
+        <tr th:each="user : ${allUsers}">
+            <td th:text="${user.getId()}"></td>
+            <td th:text="${user.getUsername()}"></td>
+            <td>
+                <ul th:each="role: ${user.getRoles()}">
+                    <li th:text="${role.getName()}"></li>
+                </ul>
+            </td>
+            <td>
+                <form action="/admin" method="post">
+                    <input type="hidden" name="userId" th:value="${user.getId()}"/>
+                    <input type="hidden" name="action" value="delete"/>
+                    <button type="submit" class="simple-red-button">Delete (block)</button>
+                </form>
+                <form action="/admin" method="post">
+                    <input type="hidden" name="userId" th:value="${user.getId()}"/>
+                    <input type="hidden" name="action" value="make_analyst"/>
+                    <button type="submit" class="simple-red-button">Make analyst</button>
+                </form>
+                <form action="/admin" method="post">
+                    <input type="hidden" name="userId" th:value="${user.getId()}"/>
+                    <input type="hidden" name="action" value="make_user"/>
+                    <button type="submit" class="simple-red-button">Make user</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>
 </body>
 </html>

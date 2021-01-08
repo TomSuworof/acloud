@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>ACloud</title>
@@ -12,21 +12,6 @@
     <div>
         <form action="/dashboard">
             <button>Dashboard</button>
-        </form>
-    </div>
-    <div th:if="${show_personal_area}">
-        <form action="/personal_area">
-            <button>Personal area</button>
-        </form>
-    </div>
-    <div th:if="${show_logout}">
-        <form action="/logout">
-            <button>Logout</button>
-        </form>
-    </div>
-    <div th:if="${show_admin_page}">
-        <form action="/admin">
-            <button>Admin</button>
         </form>
     </div>
 <!--    <div th:if="${show_analyst_page}">-->

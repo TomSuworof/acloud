@@ -55,5 +55,15 @@
         <button type="submit">Submit</button>
     </form>
 </div>
+<div th:if="${show_admin_page}">
+    <form action="/admin">
+        <button>Admin</button>
+    </form>
+</div>
+<div>
+    <form action="/logout">
+        <button>Logout</button>
+    </form>
+</div>
 </body>
 </html>

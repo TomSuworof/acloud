@@ -117,4 +117,18 @@ public class UserService implements UserDetailsService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    public boolean isUser(User user, String role) {
+        if (role.equals("admin") && user.getRoles().contains(new Role((long) 1, "ROLE_ADMIN"))) {
+            return true;
+        } else if (role.equals("analyst") && user.getRoles().contains(new Role((long) 2, "ROLE_ANALYST"))) {
+            return true;
+        } else if (role.equals("user") && user.getRoles().contains(new Role((long) 3, "ROLE_USER"))) {
+            return true;
+        } else if (role.equals("blocked") && user.getRoles().contains(new Role((long) 0, "ROLE_BLOCKED"))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
