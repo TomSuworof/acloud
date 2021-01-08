@@ -1,6 +1,6 @@
 # acloud
 
-acloud is a service of cloud storage
+acloud is a cloud storage service
 
 the service has full-text search, based on Apache Lucene
 
