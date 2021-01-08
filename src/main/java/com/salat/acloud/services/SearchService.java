@@ -2,6 +2,7 @@ package com.salat.acloud.services;
 
 import com.salat.acloud.entities.User;
 import com.salat.acloud.entities.UserFile;
+import com.salat.acloud.parsers.DOCXParser;
 import com.salat.acloud.parsers.TXTParser;
 import lombok.RequiredArgsConstructor;
 import org.apache.lucene.analysis.Analyzer;
@@ -40,13 +41,18 @@ public class SearchService {
             List<File> txtFiles = filesForIndexing.stream()
                     .filter(file -> userFileService.getExtension(file).equals("txt"))
                     .collect(Collectors.toList());
+            List<File> docxFiles = filesForIndexing.stream()
+                    .filter(file -> userFileService.getExtension(file).equals("docx"))
+                    .collect(Collectors.toList());
 
-            List<Document> docsFromTxts = TXTParser.parse(txtFiles);
+            List<Document> documents = new ArrayList<>();
+            documents.addAll(TXTParser.parse(txtFiles));
+            documents.addAll(DOCXParser.parse(docxFiles));
 
             Analyzer analyzer = new EnglishAnalyzer();
 //            Directory directory = new NIOFSDirectory(Paths.get("/" + currentUser.getId()));
             Directory directory = new RAMDirectory();
-            updateIndex(docsFromTxts, analyzer, directory);
+            updateIndex(documents, analyzer, directory);
 
             QueryParser parser = new QueryParser("content", analyzer);
             IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(directory));
@@ -60,7 +66,7 @@ public class SearchService {
             for (ScoreDoc hit : search.scoreDocs) {
                 System.out.println(hit);
 //                System.out.println(docsFromTxts.get(hit.doc));
-                String resultFilename = docsFromTxts.get(hit.doc).getField("filename").stringValue();
+                String resultFilename = documents.get(hit.doc).getField("filename").stringValue();
                 System.out.println(resultFilename);
                 results.add(currentUser.getUserFiles().stream()
                         .filter(file -> file.getFilename().equals(resultFilename))

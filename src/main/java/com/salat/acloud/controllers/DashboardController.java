@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,13 +31,24 @@ public class DashboardController {
         return "dashboard";
     }
 
-    @PostMapping("/dashboard/load_file")
+    @PostMapping("/dashboard/load")
     public String loadFile(@RequestParam(name = "file") MultipartFile loadedFile, Model model) {
         User currentUser = userService.getUserFromContext();
         if (userFileService.loadFileTo(loadedFile, currentUser)) {
             return "redirect:/dashboard";
         } else {
             model.addAttribute("error", "Error loading file");
+            return "dashboard";
+        }
+    }
+
+    @GetMapping("/dashboard/delete/{id}")
+    public String deleteFile(@PathVariable Long id, Model model) {
+        User currentUser = userService.getUserFromContext();
+        if (userFileService.deleteFileFrom(id, currentUser)) {
+            return "redirect:/dashboard";
+        } else {
+            model.addAttribute("error", "Can not delete file");
             return "dashboard";
         }
     }

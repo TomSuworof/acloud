@@ -31,8 +31,32 @@ public class UserFileService {
     private boolean saveFile(UserFile userFile) {
         try {
             userFileRepository.save(userFile);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    public boolean deleteFileFrom(Long id, User user) {
+        try {
+            UserFile userFileForDeleting = user.getUserFiles().stream()
+                    .filter(file -> file.getId().equals(id))
+                    .collect(Collectors.toList()).get(0);
+            Set<UserFile> userFiles = user.getUserFiles();
+            userFiles.remove(userFileForDeleting);
+            user.setUserFiles(userFiles);
+            return userService.updateUser(user, false) && deleteFile(userFileForDeleting);
+        } catch (IndexOutOfBoundsException exception) {
+            return false;
+        }
+    }
+
+    private boolean deleteFile(UserFile userFile) {
+        try {
+            userFileRepository.delete(userFile);
+        } catch (Exception exception) {
+            exception.printStackTrace();
             return false;
         }
         return true;
