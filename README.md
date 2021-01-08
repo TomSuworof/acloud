@@ -5,7 +5,7 @@ acloud is a cloud storage service
 the service has full-text search, based on Apache Lucene
 
 ## Visit us
-link: https://acloud.herokuapp.com/
+link: https://acl0ud.herokuapp.com/
 
 ## Search supported for
 - TXT
