@@ -25,6 +25,7 @@ public class MainController {
 //            }
             model.addAttribute("show_personal_area", true);
             model.addAttribute("show_logout", true);
+            return "redirect:/dashboard";
         }
         return "index";
     }
