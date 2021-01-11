@@ -1,43 +1,46 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <link href="/static/css/dashboard_style.css" rel="stylesheet" type="text/css" media="all" />    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="/static/css/dashboard_style.css" rel="stylesheet" type="text/css" media="all" />
+    <meta charset="UTF-8">
     <title>Dashboard</title>
 </head>
 <body>
-<div class="header">
-    <div class="header-logo">
+<div class="header row">
+    <div class="header-logo col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
         <h1>Dashboard</h1>
     </div>
-    <div class="header-button-personal-area">
+    <div class="header-button-personal-area col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
         <form action="/personal_area">
             <button>Personal area</button>
         </form>
     </div>
 </div>
-<div class="header-container">
+<div class="header-main-actions">
     <div class="header-main-link">
         <a href="/">Main</a>
     </div>
     <div class="header-search">
         <form action="/dashboard/search" method="get">
-            <div>
+            <div class="search-input">
                 <label>
                     <input type="text" name="query" placeholder="Write query">
                 </label>
             </div>
-            <div>
+            <div class="search-button">
                 <button type="submit">Search</button>
             </div>
         </form>
     </div>
     <div class="header-add-file">
-        <div>
+        <div class="header-add-file-form">
             <form action="/dashboard/load" method="post" enctype="multipart/form-data">
-                <div>
+                <div class="header-add-file-form-file">
                     <input type="file" name="file">
                 </div>
-                <div>
+                <div class="header-add-file-form-button">
                     <button type="submit">Submit</button>
                 </div>
             </form>
@@ -49,8 +52,8 @@
 </div>
 <div>
     <h2>Files</h2>
-    <div>
-        <div th:each="userFile : ${files}">
+    <div class="files row">
+        <div class="file-container col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3" th:each="userFile : ${files}">
             <a download th:href="'/download_my/' + ${userFile.getId()}"><h3 th:text="${userFile.getFilename()}"></h3></a>
             <div>Downloading publicly:
                 <div th:if="${userFile.isCanBeDownloadedPublicly()}">
