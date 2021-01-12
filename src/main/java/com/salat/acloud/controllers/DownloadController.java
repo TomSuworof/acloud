@@ -2,7 +2,6 @@ package com.salat.acloud.controllers;
 
 import com.salat.acloud.services.UserFileService;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,27 +21,25 @@ public class DownloadController {
     public @ResponseBody Object getMyFile(@PathVariable Long id, HttpServletResponse response) {
         try {
             File responseFile = userFileService.getMyFileById(id).makeFile();
-            response.setContentType("application/" + userFileService.getExtension(responseFile));
+            response.setContentType("application/" + userFileService.getContentType(responseFile));
             response.setHeader("Content-Disposition", "inline; filename=" + responseFile.getName());
             response.setHeader("Content-Length", String.valueOf(responseFile.length()));
             return new FileSystemResource(responseFile);
         } catch (FileNotFoundException noFile) {
-            return "You have no rights"; // todo replace by page 'no_rights'
+            return "You have no rights";
         }
-    }
+    } // todo replace by page 'no_rights'
 
     @GetMapping("/download/{id}")
-    public void getSomeFile(@PathVariable Long id, HttpServletResponse response) {
+    public @ResponseBody Object getSomeFile(@PathVariable Long id, HttpServletResponse response) {
         try {
             File responseFile = userFileService.getSomeFileById(id).makeFile();
-            InputStream inputStream = new FileInputStream(responseFile);
-            IOUtils.copy(inputStream, response.getOutputStream());
-            response.setContentType("application/" + userFileService.getExtension(responseFile));
+            response.setContentType("application/" + userFileService.getContentType(responseFile));
             response.setHeader("Content-Disposition", "inline; filename=" + responseFile.getName());
             response.setHeader("Content-Length", String.valueOf(responseFile.length()));
-            response.flushBuffer();
-        } catch (IOException e) {
-            e.printStackTrace();
+            return new FileSystemResource(responseFile);
+        } catch (FileNotFoundException e) {
+            return "You have no rights";
         }
     } // todo replace by page 'no_rights'
 

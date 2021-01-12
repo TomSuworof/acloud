@@ -39,10 +39,10 @@ public class SearchService {
                     .map(UserFile::makeFile)
                     .collect(Collectors.toList()); // todo this shit clogs memory
             List<File> txtFiles = filesForIndexing.stream()
-                    .filter(file -> userFileService.getExtension(file).equals("txt"))
+                    .filter(file -> userFileService.getContentType(file).equals("txt"))
                     .collect(Collectors.toList());
             List<File> docxFiles = filesForIndexing.stream()
-                    .filter(file -> userFileService.getExtension(file).equals("docx"))
+                    .filter(file -> userFileService.getContentType(file).equals("docx"))
                     .collect(Collectors.toList());
 
             List<Document> documents = new ArrayList<>();

@@ -60,7 +60,7 @@
                     <form th:action="'/download_my/disable/' + ${userFile.getId()}">
                         <button>Disable</button>
                     </form>
-                    <a th:href="'/download/' + ${userFile.getId()}">Link</a>
+                    <a download th:href="'/download/' + ${userFile.getId()}">Link</a>
                 </div>
                 <div th:unless="${userFile.isCanBeDownloadedPublicly()}">
                     <form th:action="'/download_my/enable/' + ${userFile.getId()}">
