@@ -7,6 +7,7 @@ import com.salat.acloud.parsers.TXTParser;
 import lombok.RequiredArgsConstructor;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.ru.RussianAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
@@ -50,6 +51,7 @@ public class SearchService {
             documents.addAll(DOCXParser.parse(docxFiles));
 
             Analyzer analyzer = new EnglishAnalyzer();
+//            Analyzer analyzerRussian = new RussianAnalyzer(); todo
 //            Directory directory = new NIOFSDirectory(Paths.get("/" + currentUser.getId()));
             Directory directory = new RAMDirectory();
             updateIndex(documents, analyzer, directory);
