@@ -26,7 +26,7 @@
         <form action="/dashboard/search" method="get">
             <div class="search-input">
                 <label>
-                    <input type="text" name="query" placeholder="Write query">
+                    <input th:value="${query}" type="text" name="query" placeholder="Write query">
                 </label>
             </div>
             <div class="search-button">

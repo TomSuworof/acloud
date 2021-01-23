@@ -22,8 +22,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,48 +32,57 @@ public class SearchService {
     private final UserFileService userFileService;
 
     public List<UserFile> getFilesByQuery(String queryStr) throws FileNotFoundException {
-        try {
-            User currentUser = userService.getUserFromContext();
+        User currentUser = userService.getUserFromContext();
 
+        List<Analyzer> analyzers = Arrays.asList(new EnglishAnalyzer(), new RussianAnalyzer());
+
+        Set<UserFile> results = new HashSet<>();
+        for (Analyzer analyzer : analyzers) {
+            results.addAll(getFilesByQueryAndAnalyzerOfUser(queryStr, analyzer, currentUser));
+        }
+        return new ArrayList<>(results);
+    }
+
+    private List<UserFile> getFilesByQueryAndAnalyzerOfUser(String queryStr, Analyzer analyzer, User currentUser) throws FileNotFoundException {
+        try {
             List<File> filesForIndexing = currentUser.getUserFiles().stream()
                     .map(UserFile::makeFile)
                     .collect(Collectors.toList()); // todo this shit clogs memory
             List<File> txtFiles = filesForIndexing.stream()
-                    .filter(file -> userFileService.getContentType(file).equals("txt"))
+                    .filter(file -> userFileService.getExtension(file).equals("txt"))
                     .collect(Collectors.toList());
             List<File> docxFiles = filesForIndexing.stream()
-                    .filter(file -> userFileService.getContentType(file).equals("docx"))
+                    .filter(file -> userFileService.getExtension(file).equals("docx"))
                     .collect(Collectors.toList());
+            List<File> pdfFiles = filesForIndexing.stream()
+                    .filter(file -> userFileService.getExtension(file).equals("pdf"))
+                    .collect(Collectors.toList());
+
 
             List<Document> documents = new ArrayList<>();
             documents.addAll(TXTParser.parse(txtFiles));
             documents.addAll(DOCXParser.parse(docxFiles));
+//            documents.addAll(PDFParser.parse(pdfFiles)); todo
 
-            Analyzer analyzer = new EnglishAnalyzer();
-//            Analyzer analyzerRussian = new RussianAnalyzer(); todo
-//            Directory directory = new NIOFSDirectory(Paths.get("/" + currentUser.getId()));
             Directory directory = new RAMDirectory();
+//            Directory directory = new NIOFSDirectory(Paths.get("/" + currentUser.getId())); todo
+
             updateIndex(documents, analyzer, directory);
 
             QueryParser parser = new QueryParser("content", analyzer);
             IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(directory));
-
             Query query = parser.parse(queryStr);
-
             TopFieldDocs search = searcher.search(query, filesForIndexing.size(), Sort.RELEVANCE);
-            System.out.println(search.totalHits);
 
             List<UserFile> results = new ArrayList<>();
             for (ScoreDoc hit : search.scoreDocs) {
                 System.out.println(hit);
-//                System.out.println(docsFromTxts.get(hit.doc));
                 String resultFilename = documents.get(hit.doc).getField("filename").stringValue();
                 System.out.println(resultFilename);
                 results.add(currentUser.getUserFiles().stream()
                         .filter(file -> file.getFilename().equals(resultFilename))
                         .collect(Collectors.toList())
                         .get(0));
-                System.out.println();
             }
 
             directory.close();
@@ -86,7 +94,7 @@ public class SearchService {
         }
     }
 
-    public void updateIndex(List<Document> documents, Analyzer analyzer, Directory directory) throws IOException {
+    private void updateIndex(List<Document> documents, Analyzer analyzer, Directory directory) throws IOException {
         IndexWriter indexWriter = new IndexWriter(directory, new IndexWriterConfig(analyzer));
         for (Document document : documents) {
             indexWriter.addDocument(document);

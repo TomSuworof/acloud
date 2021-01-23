@@ -58,6 +58,7 @@ public class DashboardController {
         try {
             List<UserFile> userFilesByQuery = searchService.getFilesByQuery(query);
             model.addAttribute("files", userFilesByQuery);
+            model.addAttribute("query", query);
             return "dashboard";
         } catch (FileNotFoundException noFile) {
             model.addAttribute("error", "Something went wrong");

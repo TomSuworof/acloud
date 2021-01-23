@@ -81,13 +81,9 @@ public class UserFileService {
         }
     }
 
-    public String getContentType(File file) {
+    public String getExtension(File file) {
         String[] splitted = file.getName().split("\\.");
-        return switch(splitted[splitted.length - 1]) {
-            case "txt" -> "txt";
-            case "docx" -> "vnd.openxmlformats-officedocument.wordprocessingml.document";
-            default -> "txt";
-        };
+        return splitted[splitted.length - 1];
     }
 
     public boolean setVisibility(Long id, String mode) {
