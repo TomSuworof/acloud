@@ -3,6 +3,7 @@ package com.salat.acloud.services;
 import com.salat.acloud.entities.User;
 import com.salat.acloud.entities.UserFile;
 import com.salat.acloud.parsers.DOCXParser;
+import com.salat.acloud.parsers.PDFParser;
 import com.salat.acloud.parsers.TXTParser;
 import lombok.RequiredArgsConstructor;
 import org.apache.lucene.analysis.Analyzer;
@@ -62,7 +63,7 @@ public class SearchService {
             List<Document> documents = new ArrayList<>();
             documents.addAll(TXTParser.parse(txtFiles));
             documents.addAll(DOCXParser.parse(docxFiles));
-//            documents.addAll(PDFParser.parse(pdfFiles)); todo
+            documents.addAll(PDFParser.parse(pdfFiles));
 
             Directory directory = new RAMDirectory();
 //            Directory directory = new NIOFSDirectory(Paths.get("/" + currentUser.getId())); todo
