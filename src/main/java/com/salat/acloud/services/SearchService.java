@@ -93,9 +93,8 @@ public class SearchService {
             System.out.println("Files:");
 
             for (ScoreDoc hit : search.scoreDocs) {
-//                System.out.println(hit);
                 try {
-                    String resultFilename = documents.get(hit.doc).getField("filename").stringValue();
+                    String resultFilename = searcher.doc(hit.doc).getField("filename").stringValue();
                     System.out.println(resultFilename);
                     results.add(currentUser.getUserFiles().stream()
                             .filter(file -> file.getFilename().equals(resultFilename))
