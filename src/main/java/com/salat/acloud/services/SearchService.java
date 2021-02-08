@@ -19,12 +19,14 @@ import org.apache.lucene.search.*;
 import org.apache.lucene.search.spell.LuceneDictionary;
 import org.apache.lucene.search.spell.SpellChecker;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,16 +37,16 @@ public class SearchService {
     private final UserFileService userFileService;
 
     public List<String> getSuggestionsByQuery(String queryStr) throws IOException {
-//        User currentUser = userService.getUserFromContext();
+        User currentUser = userService.getUserFromContext();
 
-        Set<String> suggestions = new HashSet<>(getSuggestionsByQueryAndAnalyzerOfUser(queryStr));
+        Set<String> suggestions = new HashSet<>(getSuggestionsByQueryAndAnalyzerOfUser(queryStr, currentUser));
 
         return new ArrayList<>(suggestions);
     }
 
-    private List<String> getSuggestionsByQueryAndAnalyzerOfUser(String queryStr) throws IOException {
-        Directory directory = new RAMDirectory();
-//        Directory directory = new NIOFSDirectory(Paths.get("/" + currentUser.getId()));
+    private List<String> getSuggestionsByQueryAndAnalyzerOfUser(String queryStr, User currentUser) throws IOException {
+//        Directory directory = new RAMDirectory();
+        Directory directory = new NIOFSDirectory(Paths.get("indexes/" + currentUser.getId()));
         SpellChecker spellChecker = new SpellChecker(directory);
         spellChecker.indexDictionary(new LuceneDictionary(DirectoryReader.open(directory), "content"), new IndexWriterConfig(), true);
         directory.close();
@@ -83,8 +85,8 @@ public class SearchService {
             documents.addAll(DOCXParser.parse(docxFiles));
             documents.addAll(PDFParser.parse(pdfFiles));
 
-            Directory directory = new RAMDirectory();
-//            Directory directory = new NIOFSDirectory(Paths.get("/" + currentUser.getId()));
+//            Directory directory = new RAMDirectory();
+            Directory directory = new NIOFSDirectory(Paths.get("indexes/" + currentUser.getId()));
 
             updateIndex(documents, analyzer, directory);
 
