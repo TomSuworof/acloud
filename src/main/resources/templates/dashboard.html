@@ -47,7 +47,7 @@
         </div>
     </div>
 </div>
-<div th:if="${suggestions.size() > 0}">
+<div th:if="${suggestions != null && suggestions.size() > 0}">
     <div>
         <h3>Suggestions:</h3>
     </div>
