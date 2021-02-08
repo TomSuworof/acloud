@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -57,10 +57,11 @@ public class DashboardController {
     public String getSearchResults(@RequestParam String query, Model model) {
         try {
             List<UserFile> userFilesByQuery = searchService.getFilesByQuery(query);
+            searchService.getSuggestionsByQuery(query).forEach(System.out::println);
             model.addAttribute("files", userFilesByQuery);
             model.addAttribute("query", query);
             return "dashboard";
-        } catch (FileNotFoundException noFile) {
+        } catch (IOException noFile) {
             model.addAttribute("error", "Something went wrong");
             return "dashboard";
         }

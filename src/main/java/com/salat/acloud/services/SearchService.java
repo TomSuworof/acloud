@@ -16,6 +16,8 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
+import org.apache.lucene.search.spell.LuceneDictionary;
+import org.apache.lucene.search.spell.SpellChecker;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,26 @@ import java.util.stream.Collectors;
 public class SearchService {
     private final UserService userService;
     private final UserFileService userFileService;
+
+    private static final Directory directory = new RAMDirectory();
+
+    public List<String> getSuggestionsByQuery(String queryStr) throws IOException {
+        User currentUser = userService.getUserFromContext();
+
+        List<Analyzer> analyzers = Arrays.asList(new EnglishAnalyzer(), new RussianAnalyzer());
+
+        Set<String> suggestions = new HashSet<>();
+        for (Analyzer analyzer: analyzers) {
+            suggestions.addAll(getSuggestionsByQueryAndAnalyzerOfUser(queryStr, analyzer, currentUser));
+        }
+        return new ArrayList<>(suggestions);
+    }
+
+    private List<String> getSuggestionsByQueryAndAnalyzerOfUser(String queryStr, Analyzer analyzer, User currentUser) throws IOException {
+        SpellChecker spellChecker = new SpellChecker(directory);
+        spellChecker.indexDictionary(new LuceneDictionary(DirectoryReader.open(directory), "content"), new IndexWriterConfig(), true);
+        return Arrays.asList(spellChecker.suggestSimilar(queryStr, 10));
+    }
 
     public List<UserFile> getFilesByQuery(String queryStr) throws FileNotFoundException {
         User currentUser = userService.getUserFromContext();
@@ -65,7 +87,7 @@ public class SearchService {
             documents.addAll(DOCXParser.parse(docxFiles));
             documents.addAll(PDFParser.parse(pdfFiles));
 
-            Directory directory = new RAMDirectory();
+//            Directory directory = new RAMDirectory();
 //            Directory directory = new NIOFSDirectory(Paths.get("/" + currentUser.getId())); todo
 
             updateIndex(documents, analyzer, directory);
