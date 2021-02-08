@@ -60,8 +60,7 @@ public class DashboardController {
     public String getSearchResults(@RequestParam String query, Model model) {
         try {
             List<UserFile> userFilesByQuery = searchService.getFilesByQuery(query);
-            System.out.println("Suggestions:");
-            searchService.getSuggestionsByQuery(query).forEach(System.out::println);
+            model.addAttribute("suggestions", searchService.getSuggestionsByQuery(query));
             model.addAttribute("files", userFilesByQuery);
             model.addAttribute("query", query);
             return "dashboard";
@@ -71,7 +70,7 @@ public class DashboardController {
         }
     }
 
-    @GetMapping("/dashboard/suggestions")
+    @GetMapping("/suggestions")
     public String getSuggestions(@RequestParam String query) {
         try {
             Map<String, List<String>> suggestions = new HashMap<>();

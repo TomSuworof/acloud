@@ -47,6 +47,20 @@
         </div>
     </div>
 </div>
+<div th:if="${suggestions.size() > 0}">
+    <div>
+        <h3>Suggestions:</h3>
+    </div>
+    <div>
+        <ul th:each="suggestion: ${suggestions}">
+            <li>
+                <div>
+                    <a th:href="'/dashboard/search?query=' + ${suggestion}"><p th:text="${suggestion}"></p></a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div><!--todo should be in real time-->
 <div>
     <p th:text="${error}"></p>
 </div>
