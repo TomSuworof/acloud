@@ -46,7 +46,7 @@ public class SearchService {
 
     private List<String> getSuggestionsByQueryAndAnalyzerOfUser(String queryStr, User currentUser) throws IOException {
 //        Directory directory = new RAMDirectory();
-        Directory directory = new NIOFSDirectory(Paths.get("indexes/" + currentUser.getId()));
+        Directory directory = new NIOFSDirectory(Paths.get("app/indexes/" + currentUser.getId()));
         SpellChecker spellChecker = new SpellChecker(directory);
         spellChecker.indexDictionary(new LuceneDictionary(DirectoryReader.open(directory), "content"), new IndexWriterConfig(), true);
         directory.close();
@@ -86,7 +86,7 @@ public class SearchService {
             documents.addAll(PDFParser.parse(pdfFiles));
 
 //            Directory directory = new RAMDirectory();
-            Directory directory = new NIOFSDirectory(Paths.get("indexes/" + currentUser.getId()));
+            Directory directory = new NIOFSDirectory(Paths.get("app/indexes/" + currentUser.getId()));
 
             updateIndex(documents, analyzer, directory);
 
@@ -96,8 +96,12 @@ public class SearchService {
             TopFieldDocs search = searcher.search(query, filesForIndexing.size(), Sort.RELEVANCE);
 
             List<UserFile> results = new ArrayList<>();
+
+            Arrays.stream(search.scoreDocs).forEach(System.out::println);
+            System.out.println("Files:");
+
             for (ScoreDoc hit : search.scoreDocs) {
-                System.out.println(hit);
+//                System.out.println(hit);
                 String resultFilename = documents.get(hit.doc).getField("filename").stringValue();
                 System.out.println(resultFilename);
                 results.add(currentUser.getUserFiles().stream()
