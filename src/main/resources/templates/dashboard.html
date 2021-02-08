@@ -26,7 +26,7 @@
         <form action="/dashboard/search" method="get">
             <div class="search-input">
                 <label>
-                    <input th:value="${query}" type="text" name="query" placeholder="Write query">
+                    <input id="query_holder" th:value="${query}" type="text" name="query" placeholder="Write query">
                 </label>
             </div>
             <div class="search-button">
@@ -76,5 +76,6 @@
         </div>
     </div>
 </div>
+<script src="/static/js/suggester.js"></script>
 </body>
 </html>

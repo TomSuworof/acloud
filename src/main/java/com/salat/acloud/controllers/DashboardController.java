@@ -1,5 +1,6 @@
 package com.salat.acloud.controllers;
 
+import com.google.gson.Gson;
 import com.salat.acloud.entities.User;
 import com.salat.acloud.entities.UserFile;
 import com.salat.acloud.services.SearchService;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -65,6 +68,18 @@ public class DashboardController {
         } catch (IOException noFile) {
             model.addAttribute("error", "Something went wrong");
             return "dashboard";
+        }
+    }
+
+    @GetMapping("/dashboard/suggestions")
+    public String getSuggestions(@RequestParam String query) {
+        try {
+            Map<String, List<String>> suggestions = new HashMap<>();
+            suggestions.put("suggestions", searchService.getSuggestionsByQuery(query));
+            return new Gson().toJson(suggestions);
+        } catch (IOException exception) {
+            exception.printStackTrace();
+            return new Gson().toJson("error");
         }
     }
 }

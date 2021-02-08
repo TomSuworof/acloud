@@ -20,7 +20,6 @@ import org.apache.lucene.search.spell.LuceneDictionary;
 import org.apache.lucene.search.spell.SpellChecker;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
-import org.apache.lucene.store.RAMDirectory;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -39,13 +38,6 @@ public class SearchService {
     public List<String> getSuggestionsByQuery(String queryStr) throws IOException {
         User currentUser = userService.getUserFromContext();
 
-        Set<String> suggestions = new HashSet<>(getSuggestionsByQueryAndAnalyzerOfUser(queryStr, currentUser));
-
-        return new ArrayList<>(suggestions);
-    }
-
-    private List<String> getSuggestionsByQueryAndAnalyzerOfUser(String queryStr, User currentUser) throws IOException {
-//        Directory directory = new RAMDirectory();
         Directory directory = new NIOFSDirectory(Paths.get("app/indexes/" + currentUser.getId()));
         SpellChecker spellChecker = new SpellChecker(directory);
         spellChecker.indexDictionary(new LuceneDictionary(DirectoryReader.open(directory), "content"), new IndexWriterConfig(), true);
