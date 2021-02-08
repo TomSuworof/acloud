@@ -24,6 +24,7 @@ public class PDFParser {
                     document.add(new TextField("content", content, Field.Store.YES));
                     translatedFiles.add(document);
                 }
+                pdfDoc.close();
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }

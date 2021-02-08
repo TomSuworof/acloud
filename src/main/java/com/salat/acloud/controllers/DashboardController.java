@@ -57,6 +57,7 @@ public class DashboardController {
     public String getSearchResults(@RequestParam String query, Model model) {
         try {
             List<UserFile> userFilesByQuery = searchService.getFilesByQuery(query);
+            System.out.println("Suggestions:");
             searchService.getSuggestionsByQuery(query).forEach(System.out::println);
             model.addAttribute("files", userFilesByQuery);
             model.addAttribute("query", query);
