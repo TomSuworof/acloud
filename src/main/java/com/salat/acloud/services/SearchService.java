@@ -19,6 +19,7 @@ import org.apache.lucene.search.*;
 import org.apache.lucene.search.spell.LuceneDictionary;
 import org.apache.lucene.search.spell.SpellChecker;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.RAFDirectory;
 import org.apache.lucene.store.RAMDirectory;
 import org.springframework.stereotype.Service;
 
@@ -107,8 +108,6 @@ public class SearchService {
                         .collect(Collectors.toList())
                         .get(0));
             }
-
-            directory.close();
 
             return results;
         } catch (IOException | ParseException | IndexOutOfBoundsException exception) {
