@@ -102,18 +102,22 @@ public class SearchService {
 
             for (ScoreDoc hit : search.scoreDocs) {
 //                System.out.println(hit);
-                String resultFilename = documents.get(hit.doc).getField("filename").stringValue();
-                System.out.println(resultFilename);
-                results.add(currentUser.getUserFiles().stream()
-                        .filter(file -> file.getFilename().equals(resultFilename))
-                        .collect(Collectors.toList())
-                        .get(0));
+                try {
+                    String resultFilename = documents.get(hit.doc).getField("filename").stringValue();
+                    System.out.println(resultFilename);
+                    results.add(currentUser.getUserFiles().stream()
+                            .filter(file -> file.getFilename().equals(resultFilename))
+                            .collect(Collectors.toList())
+                            .get(0));
+                } catch (IndexOutOfBoundsException exception) {
+                    exception.printStackTrace();
+                }
             }
 
             directory.close();
 
             return results;
-        } catch (IOException | ParseException | IndexOutOfBoundsException exception) {
+        } catch (IOException | ParseException exception) {
             exception.printStackTrace();
             throw new FileNotFoundException();
         }
