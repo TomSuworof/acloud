@@ -19,6 +19,7 @@ import org.apache.lucene.search.*;
 import org.apache.lucene.search.spell.LuceneDictionary;
 import org.apache.lucene.search.spell.SpellChecker;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.store.RAFDirectory;
 import org.apache.lucene.store.RAMDirectory;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,23 +37,21 @@ public class SearchService {
     private final UserService userService;
     private final UserFileService userFileService;
 
-    private static final Directory directory = new RAMDirectory();
-
     public List<String> getSuggestionsByQuery(String queryStr) throws IOException {
         User currentUser = userService.getUserFromContext();
 
-        List<Analyzer> analyzers = Arrays.asList(new EnglishAnalyzer(), new RussianAnalyzer());
+//        List<Analyzer> analyzers = Arrays.asList(new EnglishAnalyzer(), new RussianAnalyzer());
 
-        Set<String> suggestions = new HashSet<>();
-        for (Analyzer analyzer: analyzers) {
-            suggestions.addAll(getSuggestionsByQueryAndAnalyzerOfUser(queryStr, analyzer, currentUser));
-        }
+        Set<String> suggestions = new HashSet<>(getSuggestionsByQueryAndAnalyzerOfUser(queryStr, currentUser));
+
         return new ArrayList<>(suggestions);
     }
 
-    private List<String> getSuggestionsByQueryAndAnalyzerOfUser(String queryStr, Analyzer analyzer, User currentUser) throws IOException {
+    private List<String> getSuggestionsByQueryAndAnalyzerOfUser(String queryStr, User currentUser) throws IOException {
+        Directory directory = new NIOFSDirectory(Paths.get("/" + currentUser.getId()));
         SpellChecker spellChecker = new SpellChecker(directory);
         spellChecker.indexDictionary(new LuceneDictionary(DirectoryReader.open(directory), "content"), new IndexWriterConfig(), true);
+        directory.close();
         return Arrays.asList(spellChecker.suggestSimilar(queryStr, 10));
     }
 
@@ -82,14 +82,13 @@ public class SearchService {
                     .filter(file -> userFileService.getExtension(file).equals("pdf"))
                     .collect(Collectors.toList());
 
-
             List<Document> documents = new ArrayList<>();
             documents.addAll(TXTParser.parse(txtFiles));
             documents.addAll(DOCXParser.parse(docxFiles));
             documents.addAll(PDFParser.parse(pdfFiles));
 
 //            Directory directory = new RAMDirectory();
-//            Directory directory = new NIOFSDirectory(Paths.get("/" + currentUser.getId())); todo
+            Directory directory = new NIOFSDirectory(Paths.get("/" + currentUser.getId()));
 
             updateIndex(documents, analyzer, directory);
 
@@ -108,6 +107,8 @@ public class SearchService {
                         .collect(Collectors.toList())
                         .get(0));
             }
+
+            directory.close();
 
             return results;
         } catch (IOException | ParseException | IndexOutOfBoundsException exception) {
