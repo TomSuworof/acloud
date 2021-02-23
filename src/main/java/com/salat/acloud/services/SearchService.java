@@ -62,15 +62,18 @@ public class SearchService {
             List<File> filesForIndexing = currentUser.getUserFiles().stream()
                     .map(UserFile::makeFile)
                     .collect(Collectors.toList()); // todo this shit clogs memory
-            List<File> txtFiles = filesForIndexing.stream()
-                    .filter(file -> userFileService.getExtension(file).equals("txt"))
-                    .collect(Collectors.toList());
-            List<File> docxFiles = filesForIndexing.stream()
-                    .filter(file -> userFileService.getExtension(file).equals("docx"))
-                    .collect(Collectors.toList());
-            List<File> pdfFiles = filesForIndexing.stream()
-                    .filter(file -> userFileService.getExtension(file).equals("pdf"))
-                    .collect(Collectors.toList());
+
+            List<File> txtFiles = new ArrayList<>();
+            List<File> docxFiles = new ArrayList<>();
+            List<File> pdfFiles = new ArrayList<>();
+
+            filesForIndexing.forEach(file -> {
+                switch (userFileService.getExtension(file)) {
+                    case "txt" -> txtFiles.add(file);
+                    case "docx" -> docxFiles.add(file);
+                    case "pdf" -> pdfFiles.add(file);
+                }
+            });
 
             List<Document> documents = new ArrayList<>();
             documents.addAll(TXTParser.parse(txtFiles));
