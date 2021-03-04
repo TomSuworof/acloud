@@ -26,7 +26,12 @@ public class MainController {
     }
 
     @GetMapping("/terms_of_use")
-    String getTerms() {
+    public String getTerms() {
         return "terms_of_use";
+    }
+
+    @GetMapping("/favicon.ico")
+    public String getFavicon() {
+        return "forward:/public/img/favicon.png";
     }
 }
