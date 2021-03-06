@@ -27,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.Phaser;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,13 +52,26 @@ public class SearchService {
         List<Analyzer> analyzers = Arrays.asList(new EnglishAnalyzer(), new RussianAnalyzer());
 
         Set<UserFile> results = new HashSet<>();
+
+        Phaser phaser = new Phaser(1);
+        List<LanguageThread> languageThreads = new ArrayList<>();
+
         for (Analyzer analyzer : analyzers) {
-            results.addAll(getFilesByQueryAndAnalyzerOfUser(queryStr, analyzer, currentUser));
+            languageThreads.add(new LanguageThread(this, queryStr, analyzer, currentUser, phaser));
         }
+
+        for (LanguageThread thread : languageThreads) {
+            thread.start();
+        }
+        phaser.arriveAndAwaitAdvance();
+        for (LanguageThread languageThread : languageThreads) {
+            results.addAll(languageThread.getUserFiles());
+        }
+
         return new ArrayList<>(results);
     }
 
-    private List<UserFile> getFilesByQueryAndAnalyzerOfUser(String queryStr, Analyzer analyzer, User currentUser) throws FileNotFoundException {
+    public List<UserFile> getFilesByQueryAndAnalyzerOfUser(String queryStr, Analyzer analyzer, User currentUser) throws FileNotFoundException {
         try {
             List<File> filesForIndexing = currentUser.getUserFiles().stream()
                     .map(UserFile::makeFile)
