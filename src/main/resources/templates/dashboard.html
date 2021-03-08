@@ -77,7 +77,7 @@
                 </div>
                 <div th:unless="${userFile.isCanBeDownloadedPublicly()}">
                     <form th:action="'/download_my/enable/' + ${userFile.getId()}">
-                        <button th:onclick="'copyToClipboard(&quot;/download/' + ${userFile.getId()} + '&quot;)'">Enable</button>
+                        <button th:onclick="'copyToClipboard(&quot;/download_page/' + ${userFile.getId()} + '&quot;)'">Enable</button>
                     </form>
                 </div>
             </div>

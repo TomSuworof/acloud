@@ -41,7 +41,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/personal_area/**").fullyAuthenticated()
                 .antMatchers("/dashboard/**").fullyAuthenticated()
                 // Доступ разрешен всем пользователей
-                .antMatchers("/", "/favicon.ico", "/terms_of_use", "/static/**", "/download/**", "/suggestions/**").permitAll()
+                .antMatchers("/",
+                        "/favicon.ico",
+                        "/terms_of_use",
+                        "/static/**",
+                        "/download/**",
+                        "/download_page/*",
+                        "/suggestions/**").permitAll()
                 //Все остальные страницы требуют аутентификации
                 .anyRequest().authenticated()
                 .and()

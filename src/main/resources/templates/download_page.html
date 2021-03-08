@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="/static/css/dashboard_style.css" rel="stylesheet" type="text/css" media="all" />
+    <title>Download page</title>
+</head>
+<body>
+<div class="header row">
+    <div class="header-logo col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
+        <h1>Dashboard</h1>
+    </div>
+</div>
+<div>
+    <h2>File</h2>
+    <div class="files row">
+        <div class="file-container col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+            <a download th:href="'/download/' + ${userFile.getId()}"><h3 th:text="${userFile.getFilename()}"></h3></a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

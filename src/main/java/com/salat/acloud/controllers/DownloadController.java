@@ -1,5 +1,6 @@
 package com.salat.acloud.controllers;
 
+import com.salat.acloud.entities.UserFile;
 import com.salat.acloud.services.UserFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
@@ -28,7 +29,18 @@ public class DownloadController {
         } catch (FileNotFoundException noFile) {
             return "You have no rights";
         }
-    } // todo replace by page 'no_rights'
+    }
+
+    @GetMapping("/download_page/{id}")
+    public String getDownloadPage(@PathVariable Long id, Model model) {
+        try {
+            UserFile responseFile = userFileService.getSomeFileById(id);
+            model.addAttribute("userFile", responseFile);
+            return "download_page";
+        } catch (FileNotFoundException e) {
+            return "no_rights";
+        }
+    }
 
     @GetMapping("/download/{id}")
     public @ResponseBody Object getSomeFile(@PathVariable Long id, HttpServletResponse response) {
@@ -41,7 +53,7 @@ public class DownloadController {
         } catch (FileNotFoundException e) {
             return "You have no rights";
         }
-    } // todo replace by page 'no_rights'
+    }
 
     @GetMapping("/download_my/{mode}/{id}")
     public String getPermissionForFile(@PathVariable String mode, @PathVariable Long id, Model model) {
