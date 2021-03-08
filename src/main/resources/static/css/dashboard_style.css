@@ -44,7 +44,3 @@ body {
     border: 1px solid black;
     width: fit-content;
 }
-
-.hidden-link-for-downloading {
-    width: 0;
-}
