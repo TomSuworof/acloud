@@ -10,6 +10,7 @@ link: https://acl0ud.herokuapp.com/
 ## Search supported for
 - TXT
 - DOCX
+- PDF 
 - _and some coming soon..._
 
 ## Technologies used
