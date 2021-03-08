@@ -69,6 +69,11 @@
     <div class="files row">
         <div class="file-container col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3" th:each="userFile : ${files}">
             <a download th:href="'/download_my/' + ${userFile.getId()}"><h3 th:text="${userFile.getFilename()}"></h3></a>
+            <div class="hidden-link-for-downloading">
+                <label>
+                    <input type="hidden" id="link" th:value="'/download/' + ${userFile.getId()}">
+                </label>
+            </div>
             <div>Downloading publicly:
                 <div th:if="${userFile.isCanBeDownloadedPublicly()}">
                     <form th:action="'/download_my/disable/' + ${userFile.getId()}">
@@ -77,11 +82,6 @@
                 </div>
                 <div th:unless="${userFile.isCanBeDownloadedPublicly()}">
                     <form th:action="'/download_my/enable/' + ${userFile.getId()}">
-                        <div class="hidden-link-for-downloading">
-                            <label>
-                                <input type="hidden" id="link" th:value="'/download/' + ${userFile.getId()}">
-                            </label>
-                        </div>
                         <button onclick="copyToClipboard()">Enable</button>
                     </form>
                 </div>
