@@ -27,7 +27,7 @@ public class AdminController {
             case "make_user" -> userService.changeRole(userId, "user");
             default -> false;
         }) {
-            return "redirect:/admin";
+            return "redirect: /admin";
         } else {
             model.addAttribute("error", "Error changing role");
             return "admin";

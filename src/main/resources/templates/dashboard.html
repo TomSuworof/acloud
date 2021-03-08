@@ -74,11 +74,15 @@
                     <form th:action="'/download_my/disable/' + ${userFile.getId()}">
                         <button>Disable</button>
                     </form>
-                    <a download th:href="'/download/' + ${userFile.getId()}">Link</a>
                 </div>
                 <div th:unless="${userFile.isCanBeDownloadedPublicly()}">
                     <form th:action="'/download_my/enable/' + ${userFile.getId()}">
-                        <button>Enable</button>
+                        <div class="hidden-link-for-downloading">
+                            <label>
+                                <input type="hidden" id="link" th:value="'/download/' + ${userFile.getId()}">
+                            </label>
+                        </div>
+                        <button onclick="copyToClipboard()">Enable</button>
                     </form>
                 </div>
             </div>
@@ -90,6 +94,6 @@
         </div>
     </div>
 </div>
-<script src="/static/js/suggester.js"></script>
+<script src="/static/js/copyToClipboard.js"></script>
 </body>
 </html>
