@@ -75,7 +75,7 @@ public class SearchService {
         try {
             List<File> filesForIndexing = currentUser.getUserFiles().stream()
                     .map(UserFile::makeFile)
-                    .collect(Collectors.toList()); // todo this shit clogs memory
+                    .collect(Collectors.toList());
 
             List<File> txtFiles = new ArrayList<>();
             List<File> docxFiles = new ArrayList<>();
