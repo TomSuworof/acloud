@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +31,11 @@ public class DashboardController {
     public String getDashboard(Model model) {
         User currentUser = userService.getUserFromContext();
         model.addAttribute("files", currentUser.getUserFiles());
+//        try (BufferedWriter writer = new BufferedWriter(new FileWriter("files.json"))) {
+//            writer.write(new Gson().toJson(currentUser.getUserFiles()));
+//        } catch (IOException ioe) {
+//            ioe.printStackTrace();
+//        }
         return "dashboard";
     }
 
