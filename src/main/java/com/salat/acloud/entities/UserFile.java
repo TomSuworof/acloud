@@ -1,13 +1,11 @@
 package com.salat.acloud.entities;
 
+import com.salat.acloud.services.EncryptionService;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.*;
 
 @Data
@@ -35,6 +33,7 @@ public class UserFile {
         this.author = author;
         this.filename = file.getOriginalFilename();
         try {
+//            this.content = EncryptionService.encode(file.getBytes());
             this.content = file.getBytes();
         } catch (IOException e) {
             e.printStackTrace();
@@ -47,6 +46,7 @@ public class UserFile {
         File file = new File(this.filename);
         try (OutputStream outputStream = new FileOutputStream(file)) {
             outputStream.write(this.content);
+//            this.content = EncryptionService.decode(this.content);
         } catch (IOException e) {
             e.printStackTrace();
         }
