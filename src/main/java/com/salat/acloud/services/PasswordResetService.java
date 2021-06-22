@@ -27,7 +27,7 @@ public class PasswordResetService {
             email = requiredUser.getEmail();
             passwordResetRepository.save(new PasswordResetRequest(id, username, created));
 
-            String link = "https://acloud.herokuapp.com/password_reset/change_password/" + id;
+            String link = "https://acl0ud.herokuapp.com/password_reset/change_password/" + id;
 
             return mailService.send(email, "password_change", link);
 
