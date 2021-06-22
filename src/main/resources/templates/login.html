@@ -12,30 +12,38 @@
     <a href="/">Main</a>
 </div>
 <div>
-    <form method="POST" action="/login">
-        <h2 class="welcome">Log in</h2>
-        <div>
-            <label>
-                <input name="username" type="text" placeholder="Username" autofocus="autofocus"/>
-                <br>
-            </label>
-        </div>
-        <div>
-            <label>
-                <br>
-                <input name="password" type="password" placeholder="Password"/>
-            </label>
-        </div>
-        <div>
-            <button type="submit">Log In</button>
-        </div>
-        <div>
-            <a href="/registration">Sign up</a>
-        </div>
-    </form>
-<!--    <div>-->
-<!--        <a href="/password_reset">Forgot password?</a>-->
-<!--    </div>-->
+    <div>
+        <form method="POST" action="/login">
+            <h2 class="welcome">Log in</h2>
+            <div>
+                <label>
+                    <input name="username" type="text" placeholder="Username" autofocus="autofocus"/>
+                    <br>
+                </label>
+            </div>
+            <div>
+                <label>
+                    <br>
+                    <input name="password" type="password" placeholder="Password"/>
+                </label>
+            </div>
+            <div class="buttons">
+                <div>
+                    <button type="submit">Log In</button>
+                </div>
+                <div>
+                    <form method="get" action="/registration">
+                        <div>
+                            <button type="submit">Sign Up</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div>
+        <a href="/password_reset">Forgot password</a>
+    </div>
 </div>
 </body>
 </html>

@@ -23,6 +23,12 @@ public class User implements UserDetails {
     private String email;
 
     @Column
+    private String secretQuestion;
+
+    @Column
+    private String secretAnswer;
+
+    @Column
     private String password;
 
     @Transient

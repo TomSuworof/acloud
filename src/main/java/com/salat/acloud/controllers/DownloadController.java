@@ -18,6 +18,17 @@ import java.io.*;
 public class DownloadController {
     private final UserFileService userFileService;
 
+    @GetMapping("/download_page/{id}")
+    public String getDownloadPage(@PathVariable Long id, Model model) {
+        try {
+            UserFile responseFile = userFileService.getSomeFileById(id);
+            model.addAttribute("userFile", responseFile);
+            return "download_page";
+        } catch (FileNotFoundException e) {
+            return "no_rights";
+        }
+    }
+
     @GetMapping("/download_my/{id}")
     public @ResponseBody Object getMyFile(@PathVariable Long id, HttpServletResponse response) {
         try {
@@ -28,17 +39,6 @@ public class DownloadController {
             return new FileSystemResource(responseFile);
         } catch (FileNotFoundException noFile) {
             return "You have no rights";
-        }
-    }
-
-    @GetMapping("/download_page/{id}")
-    public String getDownloadPage(@PathVariable Long id, Model model) {
-        try {
-            UserFile responseFile = userFileService.getSomeFileById(id);
-            model.addAttribute("userFile", responseFile);
-            return "download_page";
-        } catch (FileNotFoundException e) {
-            return "no_rights";
         }
     }
 

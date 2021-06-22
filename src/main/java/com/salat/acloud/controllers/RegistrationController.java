@@ -1,6 +1,7 @@
 package com.salat.acloud.controllers;
 
 import com.salat.acloud.entities.User;
+import com.salat.acloud.services.MailService;
 import com.salat.acloud.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RequiredArgsConstructor
 public class RegistrationController {
     private final UserService userService;
+    private final MailService mailService;
 
     @GetMapping("/registration")
     public String registration(Model model) {
@@ -38,7 +40,7 @@ public class RegistrationController {
             return "registration";
         }
         if (userService.saveUser(userForm)){
-//            mailService.send(userForm.getEmail(), "registration_confirm", userForm.getFirstName());
+            mailService.send(userForm.getEmail(), "registration_confirm", userForm.getUsername());
             return "redirect:/";
         } else {
             model.addAttribute("usernameError", "Username unavailable");
