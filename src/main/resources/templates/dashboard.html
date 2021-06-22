@@ -68,7 +68,7 @@
     <h2>Files</h2>
     <div class="files row">
         <div class="file-container col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3" th:each="userFile : ${files}">
-            <a download th:href="'/download_my/' + ${userFile.getId()}"><h3 th:text="${userFile.getFilename()}"></h3></a>
+            <a download th:href="'/download_my/' + ${userFile.getId()}"><h3 th:text="${userFile.getFilename()}" class="filename"></h3></a>
             <div>Downloading publicly:
                 <div th:if="${userFile.isCanBeDownloadedPublicly()}">
                     <form th:action="'/download_my/disable/' + ${userFile.getId()}">

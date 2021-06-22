@@ -44,3 +44,7 @@ body {
     border: 1px solid black;
     width: fit-content;
 }
+
+.filename {
+    overflow-wrap: break-word;
+}

@@ -3,6 +3,7 @@ package com.salat.acloud.services;
 import com.salat.acloud.entities.User;
 import com.salat.acloud.entities.UserFile;
 import com.salat.acloud.parsers.DOCXParser;
+import com.salat.acloud.parsers.EPUBParser;
 import com.salat.acloud.parsers.PDFParser;
 import com.salat.acloud.parsers.TXTParser;
 import lombok.RequiredArgsConstructor;
@@ -80,12 +81,14 @@ public class SearchService {
             List<File> txtFiles = new ArrayList<>();
             List<File> docxFiles = new ArrayList<>();
             List<File> pdfFiles = new ArrayList<>();
+            List<File> epubFiles = new ArrayList<>();
 
             filesForIndexing.forEach(file -> {
                 switch (userFileService.getExtension(file)) {
                     case "txt" -> txtFiles.add(file);
                     case "docx" -> docxFiles.add(file);
                     case "pdf" -> pdfFiles.add(file);
+                    case "epub" -> epubFiles.add(file);
                 }
             });
 
@@ -93,6 +96,7 @@ public class SearchService {
             documents.addAll(TXTParser.parse(txtFiles));
             documents.addAll(DOCXParser.parse(docxFiles));
             documents.addAll(PDFParser.parse(pdfFiles));
+            documents.addAll(EPUBParser.parse(epubFiles));
 
 //            Directory directory = new RAMDirectory();
             Directory directory = new NIOFSDirectory(Paths.get("app/indexes/" + currentUser.getId()));
