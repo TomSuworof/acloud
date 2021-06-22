@@ -33,13 +33,13 @@
                 <label>
                     <input id="psw" type="password" name="password" placeholder="Password" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters">
                 </label>
-<!--                <div id="message">-->
-<!--                    <h3>Password must contain the following:</h3>-->
-<!--                    <p id="letter" class="invalid">A <b>lowercase</b> letter</p>-->
-<!--                    <p id="capital" class="invalid">A <b>capital (uppercase)</b> letter</p>-->
-<!--                    <p id="number" class="invalid">A <b>number</b></p>-->
-<!--                    <p id="length" class="invalid">Minimum <b>8 characters</b></p>-->
-<!--                </div>-->
+                <div id="message">
+                    <h3>Password must contain the following:</h3>
+                    <p id="letter" class="invalid">A <b>lowercase</b> letter</p>
+                    <p id="capital" class="invalid">A <b>capital (uppercase)</b> letter</p>
+                    <p id="number" class="invalid">A <b>number</b></p>
+                    <p id="length" class="invalid">Minimum <b>8 characters</b></p>
+                </div>
             </div>
             <div>
                 <label>
@@ -50,6 +50,18 @@
                 <p th:text="${passwordError}"></p>
             </div>
         </div>
+        <div>Secret question
+            <br>
+            <label>
+                <input type="text" name="secretQuestion" placeholder="Enter your secret question" required>
+            </label>
+        </div>
+        <div>Secret answer
+            <br>
+            <label>
+                <input type="text" name="secretAnswer" placeholder="Enter your answer for secret question" required>
+            </label>
+        </div>
         <div>
             <label>
                 <input type="checkbox" name="agreement" value="true">I agree with <a href="/terms_of_use">terms of use</a>
@@ -59,5 +71,6 @@
         <button type="submit" class="simple-red-button">Sign up</button>
     </form>
 </div>
+<script src="/static/js/password_check.js"></script>
 </body>
 </html>
