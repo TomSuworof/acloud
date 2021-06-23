@@ -9,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -56,6 +55,7 @@ public class UserFileService {
         try {
             userFileRepository.delete(userFile);
         } catch (Exception exception) {
+            // I do know, what exception could be here
             exception.printStackTrace();
             return false;
         }
@@ -64,12 +64,16 @@ public class UserFileService {
 
     public UserFile getMyFileById(Long id) throws FileNotFoundException {
         User currentUser = userService.getUserFromContext();
-        List<UserFile> userFiles = currentUser.getUserFiles().stream()
-                .filter(file -> file.getId().equals(id))
-                .collect(Collectors.toList());
-        if (userFiles.size() == 1) {
-            return userFiles.get(0);
-        } throw new FileNotFoundException();
+        UserFile userFile;
+        try {
+            userFile = currentUser.getUserFiles().stream()
+                    .filter(file -> file.getId().equals(id))
+                    .collect(Collectors.toList())
+                    .get(0);
+        } catch (IndexOutOfBoundsException e) {
+            throw new FileNotFoundException();
+        }
+        return userFile;
     }
 
     public UserFile getSomeFileById(Long id) throws FileNotFoundException {
