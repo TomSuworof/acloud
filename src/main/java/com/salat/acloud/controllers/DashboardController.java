@@ -70,7 +70,7 @@ public class DashboardController {
             model.addAttribute("files", userFilesByQuery);
             model.addAttribute("query", query);
             return "dashboard";
-        } catch (IOException | CloneNotSupportedException e) {
+        } catch (IOException e) {
             model.addAttribute("error", "Something went wrong");
             return "dashboard";
         }

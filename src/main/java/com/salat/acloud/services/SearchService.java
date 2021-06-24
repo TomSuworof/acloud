@@ -8,10 +8,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.ru.RussianAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.Term;
+import org.apache.lucene.index.*;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
@@ -57,7 +54,7 @@ public class SearchService {
 
 
     // Search files in index
-    public List<UserFile> getFilesByQuery(String queryStr, User user) throws IOException, CloneNotSupportedException {
+    public List<UserFile> getFilesByQuery(String queryStr, User user) throws FileNotFoundException {
         List<Analyzer> analyzers = Arrays.asList(new EnglishAnalyzer(), new RussianAnalyzer());
         Set<UserFile> results = new HashSet<>();
 
@@ -98,9 +95,18 @@ public class SearchService {
             directory.close();
 
             return results;
+        } catch (IndexNotFoundException noIndex) {
+            this.loadFullIndex(user);
+            return this.getFilesByQuery(queryStr, user);
         } catch (IOException | ParseException e) {
             e.printStackTrace();
             throw new FileNotFoundException();
+        }
+    }
+
+    private void loadFullIndex(User user) {
+        for (UserFile userFile : user.getUserFiles()) {
+            this.loadFileToIndex(userFile, user);
         }
     }
 
