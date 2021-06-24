@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Optional;
 import java.util.Set;
@@ -17,6 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserFileService {
     private final UserService userService;
+    private final SearchService searchService;
     private final UserFileRepository userFileRepository;
 
     public boolean loadFileTo(MultipartFile file, User user) {
@@ -24,14 +24,16 @@ public class UserFileService {
         Set<UserFile> userFiles = user.getUserFiles();
         userFiles.add(userFile);
         user.setUserFiles(userFiles);
-        return saveFile(userFile) && userService.updateUser(user, false);
+        return saveFile(userFile)
+                && searchService.loadFileToIndex(userFile, user)
+                && userService.updateUser(user, false);
     }
 
     private boolean saveFile(UserFile userFile) {
         try {
             userFileRepository.save(userFile);
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
         return true;
@@ -45,8 +47,10 @@ public class UserFileService {
             Set<UserFile> userFiles = user.getUserFiles();
             userFiles.remove(userFileForDeleting);
             user.setUserFiles(userFiles);
-            return userService.updateUser(user, false) && deleteFile(userFileForDeleting);
-        } catch (IndexOutOfBoundsException exception) {
+            return userService.updateUser(user, false)
+                    && searchService.deleteFileFromIndex(userFileForDeleting, user)
+                    && deleteFile(userFileForDeleting);
+        } catch (IndexOutOfBoundsException e) {
             return false;
         }
     }
@@ -54,9 +58,8 @@ public class UserFileService {
     private boolean deleteFile(UserFile userFile) {
         try {
             userFileRepository.delete(userFile);
-        } catch (Exception exception) {
-            // I do know, what exception could be here
-            exception.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
         return true;
@@ -83,11 +86,6 @@ public class UserFileService {
         } else {
             throw new FileNotFoundException();
         }
-    }
-
-    public String getExtension(File file) {
-        String[] splitted = file.getName().split("\\.");
-        return splitted[splitted.length - 1];
     }
 
     public boolean setVisibility(Long id, String mode) {

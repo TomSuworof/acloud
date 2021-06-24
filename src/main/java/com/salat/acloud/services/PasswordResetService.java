@@ -31,7 +31,7 @@ public class PasswordResetService {
 
             return mailService.send(email, "password_change", link);
 
-        } catch (UsernameNotFoundException usernameNotFoundException) {
+        } catch (UsernameNotFoundException e) {
             return false;
         }
     }
@@ -76,7 +76,7 @@ public class PasswordResetService {
             userForNewPassword.setPasswordNew(passwordNew);
             passwordResetRepository.delete(passwordResetRequest.get());
             return userService.updateUser(userForNewPassword, true);
-        } catch (UsernameNotFoundException usernameNotFoundException) {
+        } catch (UsernameNotFoundException e) {
             return false;
         }
     }

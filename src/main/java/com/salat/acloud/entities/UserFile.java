@@ -62,4 +62,10 @@ public class UserFile {
         }
         return file;
     }
+
+    // Utilities
+    public String getExtension() {
+        String[] splitted = this.filename.split("\\.");
+        return splitted[splitted.length - 1];
+    }
 }

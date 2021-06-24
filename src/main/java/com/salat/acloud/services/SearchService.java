@@ -2,10 +2,7 @@ package com.salat.acloud.services;
 
 import com.salat.acloud.entities.User;
 import com.salat.acloud.entities.UserFile;
-import com.salat.acloud.parsers.DOCXParser;
-import com.salat.acloud.parsers.EPUBParser;
-import com.salat.acloud.parsers.PDFParser;
-import com.salat.acloud.parsers.TXTParser;
+import com.salat.acloud.parsers.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
@@ -14,6 +11,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
@@ -28,15 +26,25 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.Phaser;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class SearchService {
     private final UserService userService;
-    private final UserFileService userFileService;
 
+    private Document convertUserFileToDocument(UserFile userFile) throws IOException {
+        File file = userFile.makeFile();
+        return switch (userFile.getExtension()) {
+            case "txt"  -> TXTParser.parse(file);
+            case "docx" -> DOCXParser.parse(file);
+            case "pdf"  -> PDFParser.parse(file);
+            case "epub" -> EPUBParser.parse(file);
+            default     -> throw new IllegalStateException("Unexpected value: " + userFile.getExtension());
+        };
+    }
+
+    // Suggestion engine
     public List<String> getSuggestionsByQuery(String queryStr) throws IOException {
         User currentUser = userService.getUserFromContext();
 
@@ -47,66 +55,27 @@ public class SearchService {
         return Arrays.asList(spellChecker.suggestSimilar(queryStr, 10));
     }
 
-    public List<UserFile> getFilesByQuery(String queryStr) throws FileNotFoundException {
-        User currentUser = userService.getUserFromContext();
 
+    // Search files in index
+    public List<UserFile> getFilesByQuery(String queryStr, User user) throws IOException, CloneNotSupportedException {
         List<Analyzer> analyzers = Arrays.asList(new EnglishAnalyzer(), new RussianAnalyzer());
-
         Set<UserFile> results = new HashSet<>();
 
-        Phaser phaser = new Phaser(1);
-        List<LanguageThread> languageThreads = new ArrayList<>();
-
         for (Analyzer analyzer : analyzers) {
-            languageThreads.add(new LanguageThread(this, queryStr, analyzer, currentUser, phaser));
-        }
-
-        for (LanguageThread thread : languageThreads) {
-            thread.start();
-        }
-        phaser.arriveAndAwaitAdvance();
-        for (LanguageThread languageThread : languageThreads) {
-            results.addAll(languageThread.getUserFiles());
+            results.addAll(getFilesByQuery(queryStr, analyzer, user));
         }
 
         return new ArrayList<>(results);
     }
 
-    public List<UserFile> getFilesByQueryAndAnalyzerOfUser(String queryStr, Analyzer analyzer, User currentUser) throws FileNotFoundException {
+    private List<UserFile> getFilesByQuery(String queryStr, Analyzer analyzer, User user) throws FileNotFoundException {
         try {
-            List<File> filesForIndexing = currentUser.getUserFiles().stream()
-                    .map(UserFile::makeFile)
-                    .collect(Collectors.toList());
-
-            List<File> txtFiles = new ArrayList<>();
-            List<File> docxFiles = new ArrayList<>();
-            List<File> pdfFiles = new ArrayList<>();
-            List<File> epubFiles = new ArrayList<>();
-
-            filesForIndexing.forEach(file -> {
-                switch (userFileService.getExtension(file)) {
-                    case "txt" -> txtFiles.add(file);
-                    case "docx" -> docxFiles.add(file);
-                    case "pdf" -> pdfFiles.add(file);
-                    case "epub" -> epubFiles.add(file);
-                }
-            });
-
-            List<Document> documents = new ArrayList<>();
-            documents.addAll(TXTParser.parse(txtFiles));
-            documents.addAll(DOCXParser.parse(docxFiles));
-            documents.addAll(PDFParser.parse(pdfFiles));
-            documents.addAll(EPUBParser.parse(epubFiles));
-
-//            Directory directory = new RAMDirectory();
-            Directory directory = new NIOFSDirectory(Paths.get("app/indexes/" + currentUser.getId()));
-
-            updateIndex(documents, analyzer, directory);
+            Directory directory = new NIOFSDirectory(Paths.get("app/indexes/" + user.getId()));
 
             QueryParser parser = new QueryParser("content", analyzer);
             IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(directory));
             Query query = parser.parse(queryStr);
-            TopFieldDocs search = searcher.search(query, filesForIndexing.size(), Sort.RELEVANCE);
+            TopFieldDocs search = searcher.search(query, user.getUserFiles().size(), Sort.RELEVANCE);
 
             List<UserFile> results = new ArrayList<>();
 
@@ -117,29 +86,68 @@ public class SearchService {
                 try {
                     String resultFilename = searcher.doc(hit.doc).getField("filename").stringValue();
                     System.out.println(resultFilename);
-                    results.add(currentUser.getUserFiles().stream()
+                    results.add(user.getUserFiles().stream()
                             .filter(file -> file.getFilename().equals(resultFilename))
                             .collect(Collectors.toList())
                             .get(0));
-                } catch (IndexOutOfBoundsException exception) {
-                    exception.printStackTrace();
+                } catch (IndexOutOfBoundsException e) {
+                    e.printStackTrace();
                 }
             }
 
             directory.close();
 
             return results;
-        } catch (IOException | ParseException exception) {
-            exception.printStackTrace();
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
             throw new FileNotFoundException();
         }
     }
 
-    private void updateIndex(List<Document> documents, Analyzer analyzer, Directory directory) throws IOException {
-        IndexWriter indexWriter = new IndexWriter(directory, new IndexWriterConfig(analyzer));
-        for (Document document : documents) {
-            indexWriter.addDocument(document);
+
+    // Upload new files to index
+    public boolean loadFileToIndex(UserFile userFile, User user) {
+        try {
+            Document document = this.convertUserFileToDocument(userFile);
+            List<Analyzer> analyzers = Arrays.asList(new EnglishAnalyzer(), new RussianAnalyzer());
+            for (Analyzer analyzer : analyzers) {
+                loadFileToIndex(document, analyzer, user);
+            }
+
+        } catch (IOException | IllegalStateException e) {
+            e.printStackTrace();
+            return false;
         }
+        return true;
+    }
+
+    private void loadFileToIndex(Document document, Analyzer analyzer, User user) throws IOException {
+        Directory directory = new NIOFSDirectory(Paths.get("app/indexes/" + user.getId()));
+        IndexWriter indexWriter = new IndexWriter(directory, new IndexWriterConfig(analyzer));
+        indexWriter.addDocument(document);
+        indexWriter.close();
+    }
+
+
+    // Delete file from index
+    public boolean deleteFileFromIndex(UserFile userFile, User user) {
+        try {
+            Document document = this.convertUserFileToDocument(userFile);
+            List<Analyzer> analyzers = Arrays.asList(new EnglishAnalyzer(), new RussianAnalyzer());
+            for (Analyzer analyzer : analyzers) {
+                deleteFileFromIndex(document, analyzer, user);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private void deleteFileFromIndex(Document document, Analyzer analyzer, User user) throws IOException {
+        Directory directory = new NIOFSDirectory(Paths.get("app/indexes/" + user.getId()));
+        IndexWriter indexWriter = new IndexWriter(directory, new IndexWriterConfig(analyzer));
+        indexWriter.deleteDocuments(new Term(document.get("filename")));
         indexWriter.close();
     }
 }

@@ -9,32 +9,26 @@ import org.apache.lucene.document.TextField;
 
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class EPUBParser {
-    public static List<Document> parse(List<File> files) {
-        List<Document> translatedFiles = new ArrayList<>();
-        for (File file : files) {
-            Document document = new Document();
-            document.add(new TextField("filename", file.getName(), Field.Store.YES));
-            StringBuilder content = new StringBuilder();
-            try {
-                Reader reader = new Reader();
-                reader.setMaxContentPerSection(1000);
-                reader.setIsIncludingTextContent(true);
-                reader.setFullContent(file.getPath());
+    public static Document parse(File file) {
+        Document document = new Document();
+        document.add(new TextField("filename", file.getName(), Field.Store.YES));
+        StringBuilder content = new StringBuilder();
+        try {
+            Reader reader = new Reader();
+            reader.setMaxContentPerSection(1000);
+            reader.setIsIncludingTextContent(true);
+            reader.setFullContent(file.getPath());
 
-                for (int i = 0;; i++) {
-                    content.append(reader.readSection(i).getSectionTextContent());
-                }
-            } catch (ReadingException | OutOfPagesException e) {
-                e.printStackTrace();
-            } finally {
-                document.add(new TextField("content", content.toString(), Field.Store.YES));
+            for (int i = 0; ; i++) {
+                content.append(reader.readSection(i).getSectionTextContent());
             }
-            translatedFiles.add(document);
+        } catch (ReadingException | OutOfPagesException e) {
+            e.printStackTrace();
+        } finally {
+            document.add(new TextField("content", content.toString(), Field.Store.YES));
         }
-        return translatedFiles;
+        return document;
     }
 }

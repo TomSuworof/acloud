@@ -64,12 +64,13 @@ public class DashboardController {
     @GetMapping("/dashboard/search")
     public String getSearchResults(@RequestParam String query, Model model) {
         try {
-            List<UserFile> userFilesByQuery = searchService.getFilesByQuery(query);
+            User currentUser = userService.getUserFromContext();
+            List<UserFile> userFilesByQuery = searchService.getFilesByQuery(query, currentUser);
             model.addAttribute("suggestions", searchService.getSuggestionsByQuery(query));
             model.addAttribute("files", userFilesByQuery);
             model.addAttribute("query", query);
             return "dashboard";
-        } catch (IOException noFile) {
+        } catch (IOException | CloneNotSupportedException e) {
             model.addAttribute("error", "Something went wrong");
             return "dashboard";
         }
@@ -81,8 +82,8 @@ public class DashboardController {
             Map<String, List<String>> suggestions = new HashMap<>();
             suggestions.put("suggestions", searchService.getSuggestionsByQuery(query));
             return new Gson().toJson(suggestions);
-        } catch (IOException exception) {
-            exception.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
             return new Gson().toJson("error");
         }
     }

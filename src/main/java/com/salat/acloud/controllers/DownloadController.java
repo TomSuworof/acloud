@@ -32,12 +32,12 @@ public class DownloadController {
     @GetMapping("/download_my/{id}")
     public @ResponseBody Object getMyFile(@PathVariable Long id, HttpServletResponse response) {
         try {
-            File responseFile = userFileService.getMyFileById(id).makeFile();
-            response.setContentType("application/" + userFileService.getExtension(responseFile));
-            response.setHeader("Content-Disposition", "inline; filename=" + responseFile.getName());
-            response.setHeader("Content-Length", String.valueOf(responseFile.length()));
-            return new FileSystemResource(responseFile);
-        } catch (FileNotFoundException noFile) {
+            UserFile responseFile = userFileService.getMyFileById(id);
+            response.setContentType("application/" + responseFile.getExtension());
+            response.setHeader("Content-Disposition", "inline; filename=" + responseFile.getFilename());
+            response.setHeader("Content-Length", String.valueOf(responseFile.makeFile().length()));
+            return new FileSystemResource(responseFile.makeFile());
+        } catch (FileNotFoundException e) {
             return "You have no rights";
         }
     }
@@ -45,11 +45,11 @@ public class DownloadController {
     @GetMapping("/download/{id}")
     public @ResponseBody Object getSomeFile(@PathVariable Long id, HttpServletResponse response) {
         try {
-            File responseFile = userFileService.getSomeFileById(id).makeFile();
-            response.setContentType("application/" + userFileService.getExtension(responseFile));
-            response.setHeader("Content-Disposition", "inline; filename=" + responseFile.getName());
-            response.setHeader("Content-Length", String.valueOf(responseFile.length()));
-            return new FileSystemResource(responseFile);
+            UserFile responseFile = userFileService.getSomeFileById(id);
+            response.setContentType("application/" + responseFile.getExtension());
+            response.setHeader("Content-Disposition", "inline; filename=" + responseFile.getFilename());
+            response.setHeader("Content-Length", String.valueOf(responseFile.makeFile().length()));
+            return new FileSystemResource(responseFile.makeFile());
         } catch (FileNotFoundException e) {
             return "You have no rights";
         }

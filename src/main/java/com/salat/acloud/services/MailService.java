@@ -30,7 +30,7 @@ public class MailService {
                 case "registration_confirm" -> sendRegistrationConfirm(email, message);
                 default -> false;
             };
-        } catch (EmailException emailException) {
+        } catch (EmailException e) {
             return false;
         }
     }
