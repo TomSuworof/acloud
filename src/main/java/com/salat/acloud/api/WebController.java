@@ -24,9 +24,11 @@ public class WebController {
     ) {
         Map<String, Object> response = new HashMap<>();
         if (clientService.isClientValid(clientId, clientName, clientSecret)) {
+            System.out.println("The client exists");
             response.put("number", (int) (Math.random() * 10));
             response.put("msg", "This shit is working");
         } else {
+            System.out.println("The client does not exist");
             response.put("number", 0);
             response.put("msg", "Wrong credentials");
         }
