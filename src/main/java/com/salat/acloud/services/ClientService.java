@@ -13,6 +13,9 @@ public class ClientService {
     private final ClientRepository clientRepository;
 
     public boolean isClientValid(Long clientId, String clientName, String clientSecret) {
+        System.out.println(clientId);
+        System.out.println(clientName);
+        System.out.println(clientSecret);
         Optional<Client> client = clientRepository.findClientByClientIdAndAndClientNameAndClientSecret(clientId, clientName, clientSecret);
         return client.isPresent();
     }
