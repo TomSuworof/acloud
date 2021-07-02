@@ -1,21 +1,35 @@
 package com.salat.acloud.api;
 
 import com.google.gson.Gson;
+import com.salat.acloud.services.ClientService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Controller
+@RequiredArgsConstructor
 public class WebController {
+    private final ClientService clientService;
 
     @GetMapping("/api")
-    public ResponseEntity<String> getStartPage() {
+    public ResponseEntity<String> getStartPage(
+            @RequestParam Long clientId,
+            @RequestParam String clientName,
+            @RequestParam String clientSecret
+    ) {
         Map<String, Object> response = new HashMap<>();
-        response.put("number", (int) (Math.random() * 10));
-        response.put("msg", "This shit is working");
+        if (clientService.isClientValid(clientId, clientName, clientSecret)) {
+            response.put("number", (int) (Math.random() * 10));
+            response.put("msg", "This shit is working");
+        } else {
+            response.put("number", 0);
+            response.put("msg", "Wrong credentials");
+        }
         return ResponseEntity.ok().body(new Gson().toJson(response));
     }
 }
