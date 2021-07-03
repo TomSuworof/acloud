@@ -29,7 +29,7 @@ public class WebController {
             response.put("msg", "This shit is working");
         } else {
             System.out.println("The client does not exist");
-            response.put("number", 0);
+            response.put("number", -1);
             response.put("msg", "Wrong credentials");
         }
         return ResponseEntity.ok().body(new Gson().toJson(response));
