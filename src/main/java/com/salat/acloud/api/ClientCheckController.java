@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
-public class WebController {
+public class ClientCheckController {
     private final ClientService clientService;
 
     @GetMapping("/api")
